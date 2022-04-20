@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <event name="adminhtml_store_edit_form_prepare_form">
+        <observer name="add_extra_config_fields_to_store_edit_form" instance="MageSuite\StoreAccessRestriction\Observer\AddFieldsToStoreEditView" />
+    </event>
+</config>

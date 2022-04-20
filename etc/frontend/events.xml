@@ -1,0 +1,6 @@
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <event name="controller_action_predispatch">
+        <observer name="save_cookie_from_param" instance="MageSuite\StoreAccessRestriction\Observer\SaveCookieFromParam"/>
+        <observer name="prevent_access_to_restricted_store" instance="MageSuite\StoreAccessRestriction\Observer\PreventAccessToRestrictedStore"/>
+    </event>
+</config>
