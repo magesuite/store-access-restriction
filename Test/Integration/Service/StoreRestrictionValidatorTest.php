@@ -89,7 +89,7 @@ class StoreRestrictionValidatorTest extends \Magento\TestFramework\TestCase\Abst
      * @magentoDbIsolation enabled
      * @magentoAppIsolation enabled
      */
-    public function testItReturnsNotEmptyResponseBodyAnd200ResponseCodeeForStoreViewWithEnabledAccessRestrictionAndValidUriParam(): void
+    public function testItReturnsNotEmptyResponseBodyAnd200ResponseCodeForStoreViewWithEnabledAccessRestrictionAndValidUriParam(): void
     {
         $this->setAccessRestrictedAndCookieParamForStoreView();
         $this->dispatch('http://localhost/index.php?bypass_store_restriction=stored_secret_value');
