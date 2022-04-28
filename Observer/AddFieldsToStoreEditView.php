@@ -20,6 +20,10 @@ class AddFieldsToStoreEditView implements \Magento\Framework\Event\ObserverInter
         /** @var \Magento\Framework\Data\Form $form */
         $form = $block->getForm();
         $fieldset = $form->getForm()->getElement('store_fieldset');
+        if (empty($fieldset)) {
+            return;
+        }
+        
         $fieldset->addField(
             'is_access_restricted',
             'select',
