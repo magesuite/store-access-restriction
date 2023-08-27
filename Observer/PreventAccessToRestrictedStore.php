@@ -4,36 +4,26 @@ namespace MageSuite\StoreAccessRestriction\Observer;
 
 class PreventAccessToRestrictedStore implements \Magento\Framework\Event\ObserverInterface
 {
-    const COOKIE_PARAM_NAME = 'bypass_store_restriction';
+    protected \Magento\Framework\UrlInterface $url;
 
-    /**
-     * @var \Magento\Framework\UrlInterface
-     */
-    protected $url;
+    protected \Magento\Framework\App\ActionFlag $actionFlag;
 
-    /**
-     * @var \Magento\Framework\App\ActionFlag
-     */
-    protected $actionFlag;
+    protected \Magento\Framework\App\Request\Http $request;
 
-    /**
-     * @var \Magento\Store\Model\StoreManager
-     */
-    protected $storeManager;
+    protected \Magento\Store\Model\StoreManager $storeManager;
 
-    /**
-     * @var \MageSuite\StoreAccessRestriction\Service\StoreRestrictionValidator
-     */
-    protected $storeRestrictionValidator;
+    protected \MageSuite\StoreAccessRestriction\Service\StoreRestrictionValidator $storeRestrictionValidator;
 
     public function __construct(
         \Magento\Framework\UrlInterface $url,
         \Magento\Framework\App\ActionFlag $actionFlag,
+        \Magento\Framework\App\Request\Http $request,
         \Magento\Store\Model\StoreManager $storeManager,
         \MageSuite\StoreAccessRestriction\Service\StoreRestrictionValidator $storeRestrictionValidator
     ) {
         $this->url = $url;
         $this->actionFlag = $actionFlag;
+        $this->request = $request;
         $this->storeManager = $storeManager;
         $this->storeRestrictionValidator = $storeRestrictionValidator;
     }
@@ -56,7 +46,14 @@ class PreventAccessToRestrictedStore implements \Magento\Framework\Event\Observe
 
     protected function redirectTo404($response)
     {
-        $url = $this->storeManager->getDefaultStoreView()->getBaseUrl() . 'noroute';
+        $noRoutePath = 'noroute';
+        $pathInfo = $this->request->getPathInfo();
+
+        if (trim($pathInfo, '/') == $noRoutePath) {
+            return;
+        }
+
+        $url = $this->storeManager->getDefaultStoreView()->getBaseUrl() . $noRoutePath;
         $this->actionFlag->set('', \Magento\Framework\App\Action\Action::FLAG_NO_DISPATCH, true);
         $response->setRedirect($url)->sendResponse();
     }
