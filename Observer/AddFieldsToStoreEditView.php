@@ -23,7 +23,7 @@ class AddFieldsToStoreEditView implements \Magento\Framework\Event\ObserverInter
         if (empty($fieldset)) {
             return;
         }
-        
+
         $fieldset->addField(
             'is_access_restricted',
             'select',

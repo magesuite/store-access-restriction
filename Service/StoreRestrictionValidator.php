@@ -58,7 +58,7 @@ class StoreRestrictionValidator
     protected function isRequestFromAllowedIp(): bool
     {
         $remoteAddress = $this->remoteAddress->getRemoteAddress();
-        $allowedIps = explode(',', $this->getCurrentStore()->getAllowedIps());
+        $allowedIps = explode(',', (string)$this->getCurrentStore()->getAllowedIps());
 
         return in_array($remoteAddress, $allowedIps, true);
     }
