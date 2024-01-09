@@ -5,43 +5,36 @@ namespace MageSuite\StoreAccessRestriction\Service;
 class StoreRestrictionValidator
 {
     public const RESTRICTION_BYPASS_COOKIE_NAME = 'STORE_RESTRICTION_BYPASS';
+    public const CMS_PAGE_ACTION = 'cms_index_index';
 
-    /**
-     * @var \Magento\Framework\HTTP\PhpEnvironment\RemoteAddress
-     */
-    protected $remoteAddress;
+    protected \Magento\Framework\HTTP\PhpEnvironment\RemoteAddress $remoteAddress;
 
-    /**
-     * @var \Magento\Framework\Stdlib\CookieManagerInterface
-     */
-    protected $cookieManager;
+    protected \Magento\Framework\Stdlib\CookieManagerInterface $cookieManager;
 
-    /**
-     * @var \Magento\Store\Model\StoreManager
-     */
-    protected $storeManager;
+    protected \Magento\Store\Model\StoreManager $storeManager;
 
-    /**
-     * @var \Magento\Framework\App\Request\Http
-     */
-    protected $request;
-
-    protected $currentStore = null;
+    protected \Magento\Framework\App\Request\Http $request;
 
     protected \Psr\Log\LoggerInterface $logger;
+
+    protected \MageSuite\StoreAccessRestriction\Service\CmsPagesProvider $cmsPagesProvider;
+
+    protected $currentStore = null;
 
     public function __construct(
         \Magento\Framework\HTTP\PhpEnvironment\RemoteAddress $remoteAddress,
         \Magento\Framework\Stdlib\CookieManagerInterface $cookieManager,
         \Magento\Store\Model\StoreManager $storeManager,
         \Magento\Framework\App\Request\Http $request,
-        \Psr\Log\LoggerInterface $logger
+        \Psr\Log\LoggerInterface $logger,
+        \MageSuite\StoreAccessRestriction\Service\CmsPagesProvider $cmsPagesProvider
     ) {
         $this->remoteAddress = $remoteAddress;
         $this->cookieManager = $cookieManager;
         $this->storeManager = $storeManager;
         $this->request = $request;
         $this->logger = $logger;
+        $this->cmsPagesProvider = $cmsPagesProvider;
     }
 
     public function isStoreAccessRestrictionEnabled(): bool
@@ -52,7 +45,8 @@ class StoreRestrictionValidator
 
     public function canAccessStore(): bool
     {
-        return $this->isRequestFromAllowedIp() || $this->isRequestWithBypassParam() || $this->isRequestWithRestrictionBypassCookie();
+        return $this->isRequestFromAllowedIp() || $this->isRequestWithBypassParam()
+            || $this->isRequestWithRestrictionBypassCookie() || $this->isTargetPage();
     }
 
     protected function isRequestFromAllowedIp(): bool
@@ -82,6 +76,39 @@ class StoreRestrictionValidator
 
         $expectedCookieValue = $this->getCurrentStore()->getRestrictionBypassCookieValue();
         return $cookie == $expectedCookieValue;
+    }
+
+    protected function isTargetPage(): bool
+    {
+        $currentStore = $this->getCurrentStore();
+        $cmsPageId = $currentStore->getTargetPageId();
+        if (!$cmsPageId || ($cmsPageId == 0)) {
+            return false;
+        }
+
+        $cmsPage = $this->cmsPagesProvider->getCmsPage($cmsPageId);
+
+        if (!$cmsPage) {
+            return false;
+        }
+
+        if (trim($this->request->getOriginalPathInfo(), '/') != trim($cmsPage->getIdentifier(), '/')) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public function isRedirectToAnotherStore()
+    {
+        $currentStore = $this->getCurrentStore();
+        $storeParam = $this->request->getParam('___store');
+
+        if ($storeParam && ($storeParam != $currentStore->getCode())) {
+            return true;
+        }
+
+        return false;
     }
 
     protected function getCurrentStore(): \Magento\Store\Api\Data\StoreInterface
