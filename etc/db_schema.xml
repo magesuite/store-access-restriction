@@ -4,5 +4,6 @@
         <column xsi:type="smallint" name="is_access_restricted" comment="Is Access Restricted"/>
         <column xsi:type="text" name="allowed_ips" nullable="true" comment="Allowed IPs"/>
         <column xsi:type="varchar" name="restriction_bypass_cookie_value" comment="Restriction Bypass Cookie Value"/>
+        <column xsi:type="int" name="target_page_id" comment="Target CMS Page Id"/>
     </table>
 </schema>

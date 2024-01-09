@@ -4,11 +4,16 @@ namespace MageSuite\StoreAccessRestriction\Observer;
 
 class AddFieldsToStoreEditView implements \Magento\Framework\Event\ObserverInterface
 {
-    protected $registry;
+    protected \Magento\Framework\Registry $registry;
 
-    public function __construct(\Magento\Framework\Registry $registry)
-    {
+    protected \MageSuite\StoreAccessRestriction\Service\CmsPagesProvider $cmsPagesProvider;
+
+    public function __construct(
+        \Magento\Framework\Registry $registry,
+        \MageSuite\StoreAccessRestriction\Service\CmsPagesProvider $cmsPagesProvider
+    ) {
         $this->registry = $registry;
+        $this->cmsPagesProvider = $cmsPagesProvider;
     }
 
     public function execute(\Magento\Framework\Event\Observer $observer)
@@ -61,6 +66,24 @@ class AddFieldsToStoreEditView implements \Magento\Framework\Event\ObserverInter
                     'value' => $storeModel->getRestrictionBypassCookieValue(),
                     'required' => false,
                     'class' => 'cs-csfeature__logo',
+                ]
+            );
+
+            $cmsPages = $this->cmsPagesProvider->getCmsPages();
+            $cmsPages = [0 => __('No Route Page')] + $cmsPages;
+
+            $fieldset = $form->getForm()->getElement('store_fieldset');
+            $fieldset->addField(
+                'target_page_id',
+                'select',
+                [
+                    'name' => 'store[target_page_id]',
+                    'label' => __('Target Page'),
+                    'value' => $storeModel->getTargetPageId(),
+                    'options' => $cmsPages,
+                    'required' => false,
+                    'class' => 'cs-csfeature__logo',
+                    'note' => 'The field allows for configuring the target page the customer will be redirected to when accessing a restricted store. \'No Route Page\' is the default location \noroute", which will be used when no other CMS page is selected.'
                 ]
             );
         }
