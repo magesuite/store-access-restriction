@@ -4,6 +4,8 @@ namespace MageSuite\StoreAccessRestriction\Test\Integration\Observer;
 
 class PreventAccessToRestrictedStoreTest extends \Magento\TestFramework\TestCase\AbstractController
 {
+    protected $objectManager;
+    
     protected $storeManager;
 
     protected $searchCriteriaBuilder;
