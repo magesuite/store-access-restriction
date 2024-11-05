@@ -10,18 +10,24 @@ class RemoveRestrictedStoresFromSwitcher
         \Magento\Store\Block\Switcher $subject,
         $rawStores
     ) {
-        if ($this->stores) {
-            return $this->stores;
+        $subjectClass = get_class($subject);
+
+        if (isset($this->stores[$subjectClass])) {
+            return $this->stores[$subjectClass];
         }
+
+        $this->stores[$subjectClass] = [];
 
         foreach ($rawStores as $groupId => $group) {
             foreach ($group as $storeId => $store) {
-                if (!$store->getIsAccessRestricted()) {
-                    $this->stores[$groupId][$storeId] = $store;
+                if ($store->getIsAccessRestricted()) {
+                    continue;
                 }
+
+                $this->stores[$subjectClass][$groupId][$storeId] = $store;
             }
         }
 
-        return $this->stores;
+        return $this->stores[$subjectClass];
     }
 }
