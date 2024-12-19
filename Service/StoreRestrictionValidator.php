@@ -92,7 +92,10 @@ class StoreRestrictionValidator
             return false;
         }
 
-        if (trim($this->request->getOriginalPathInfo(), '/') != trim($cmsPage->getIdentifier(), '/')) {
+        $originalPathInfo = $this->request->getOriginalPathInfo() ?? '';
+        $cmsPageIdentifier = $cmsPage->getIdentifier() ?? '';
+
+        if (trim($originalPathInfo, '/') != trim($cmsPageIdentifier, '/')) {
             return false;
         }
 
