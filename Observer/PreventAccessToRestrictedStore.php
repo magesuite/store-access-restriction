@@ -4,37 +4,17 @@ namespace MageSuite\StoreAccessRestriction\Observer;
 
 class PreventAccessToRestrictedStore implements \Magento\Framework\Event\ObserverInterface
 {
-    protected \Magento\Framework\UrlInterface $url;
-
-    protected \Magento\Framework\App\ActionFlag $actionFlag;
-
-    protected \Magento\Framework\App\Request\Http $request;
-
-    protected \Magento\Store\Model\StoreManager $storeManager;
-
-    protected \Magento\Framework\App\ResponseInterface $response;
-
-    protected \MageSuite\StoreAccessRestriction\Service\StoreRestrictionValidator $storeRestrictionValidator;
-
-    protected  \MageSuite\StoreAccessRestriction\Service\CmsPagesProvider $cmsPagesProvider;
+    public const CONTEXT_VALUE_STORE_ACCESS_RESTRICTION = 'store-access-restriction';
 
     public function __construct(
-        \Magento\Framework\UrlInterface $url,
-        \Magento\Framework\App\ActionFlag $actionFlag,
-        \Magento\Framework\App\Request\Http $request,
-        \Magento\Store\Model\StoreManager $storeManager,
-        \Magento\Framework\App\ResponseInterface $response,
-        \MageSuite\StoreAccessRestriction\Service\StoreRestrictionValidator $storeRestrictionValidator,
-        \MageSuite\StoreAccessRestriction\Service\CmsPagesProvider $cmsPagesProvider
-    ) {
-        $this->url = $url;
-        $this->actionFlag = $actionFlag;
-        $this->request = $request;
-        $this->storeManager = $storeManager;
-        $this->response = $response;
-        $this->storeRestrictionValidator = $storeRestrictionValidator;
-        $this->cmsPagesProvider = $cmsPagesProvider;
-    }
+        protected \Magento\Framework\App\ActionFlag $actionFlag,
+        protected \Magento\Framework\App\Request\Http $request,
+        protected \Magento\Store\Model\StoreManager $storeManager,
+        protected \Magento\Framework\App\ResponseInterface $response,
+        protected \MageSuite\StoreAccessRestriction\Service\StoreRestrictionValidator $storeRestrictionValidator,
+        protected \MageSuite\StoreAccessRestriction\Service\CmsPagesProvider $cmsPagesProvider,
+        protected \Magento\Framework\App\Http\Context $context,
+    ) {}
 
     public function execute(\Magento\Framework\Event\Observer $observer): void
     {
@@ -47,11 +27,12 @@ class PreventAccessToRestrictedStore implements \Magento\Framework\Event\Observe
         }
 
         if ($this->storeRestrictionValidator->canAccessStore()) {
-            $this->response->setNoCacheHeaders();
+            $this->context->setValue(self::CONTEXT_VALUE_STORE_ACCESS_RESTRICTION, 1, 0);
             return;
         }
 
         $currentStore = $this->storeManager->getStore();
+
         if ($currentStore->getTargetPageId() && ($currentStore->getTargetPageId() > 0)) {
             $this->redirectToCmsPage($currentStore);
         } else {
