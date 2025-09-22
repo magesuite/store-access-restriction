@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MageSuite\StoreAccessRestriction\Observer;
 
 class PreventAccessToRestrictedStore implements \Magento\Framework\Event\ObserverInterface
@@ -14,7 +16,8 @@ class PreventAccessToRestrictedStore implements \Magento\Framework\Event\Observe
         protected \MageSuite\StoreAccessRestriction\Service\StoreRestrictionValidator $storeRestrictionValidator,
         protected \MageSuite\StoreAccessRestriction\Service\CmsPagesProvider $cmsPagesProvider,
         protected \Magento\Framework\App\Http\Context $context,
-    ) {}
+    ) {
+    }
 
     public function execute(\Magento\Framework\Event\Observer $observer): void
     {
@@ -56,7 +59,7 @@ class PreventAccessToRestrictedStore implements \Magento\Framework\Event\Observe
 
     protected function redirectToCmsPage(\Magento\Store\Model\Store $currentStore): void
     {
-        $cmsPageId = $currentStore->getTargetPageId();
+        $cmsPageId = (int)$currentStore->getTargetPageId();
         $cmsPage = $this->cmsPagesProvider->getCmsPage($cmsPageId);
 
         if (!$cmsPage) {
@@ -72,8 +75,7 @@ class PreventAccessToRestrictedStore implements \Magento\Framework\Event\Observe
 
     public function getTargetStoreId(\Magento\Store\Model\Store $currentStore, \Magento\Cms\Model\Page $cmsPage): int
     {
-        $defaultStoreId = $this->storeManager->getDefaultStoreView()->getId();
-
+        $defaultStoreId = (int)$this->storeManager->getDefaultStoreView()->getId();
         $cmsPageStores = $cmsPage->getStores();
 
         if (empty($cmsPageStores)) {
@@ -81,11 +83,9 @@ class PreventAccessToRestrictedStore implements \Magento\Framework\Event\Observe
         }
 
         if (($cmsPageStores[0] == 0) || in_array($currentStore->getId(), $cmsPageStores)) {
-            $storeId = $currentStore->getId();
-        } else {
-            $storeId = $cmsPageStores[0];
+            return (int)$currentStore->getId();
         }
 
-        return $storeId;
+        return (int)$cmsPageStores[0];
     }
 }

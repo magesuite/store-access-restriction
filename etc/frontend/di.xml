@@ -3,4 +3,8 @@
     <type name="Magento\Store\Block\Switcher">
         <plugin name="remove_restricted_stores_from_switcher" type="MageSuite\StoreAccessRestriction\Plugin\Magento\Store\Block\Switcher\RemoveRestrictedStoresFromSwitcher"/>
     </type>
+
+    <type name="MageSuite\SeoHreflang\ViewModel\Hreflang">
+        <plugin name="disable_hreflang_for_restricted_store" type="MageSuite\StoreAccessRestriction\Plugin\MageSuite\SeoHreflang\ViewModel\Hreflang\DisableHreflangForRestrictedStore" sortOrder="10"/>
+    </type>
 </config>

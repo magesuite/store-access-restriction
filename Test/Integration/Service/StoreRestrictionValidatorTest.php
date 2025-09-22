@@ -1,35 +1,27 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MageSuite\StoreAccessRestriction\Test\Integration\Service;
 
 class StoreRestrictionValidatorTest extends \Magento\TestFramework\TestCase\AbstractController
 {
-    /**
-     * @var \Magento\TestFramework\ObjectManager
-     */
-    protected $objectManager;
-
-    /**
-     * @var \Magento\Framework\Stdlib\CookieManagerInterface
-     */
-    protected $cookieManager;
-
-    /**
-     * @var \Magento\Store\Model\StoreManagerInterface
-     */
-    protected $storeManager;
-
-    /**
-     * @var \Magento\Framework\HTTP\PhpEnvironment\RemoteAddress
-     */
-    protected $remoteAddress;
+    protected ?\Magento\TestFramework\ObjectManager $objectManager;
+    protected ?\Magento\Framework\Stdlib\CookieManagerInterface $cookieManager;
+    protected ?\Magento\Store\Model\StoreManagerInterface $storeManager;
+    protected ?\Magento\Framework\HTTP\PhpEnvironment\RemoteAddress $remoteAddress;
 
     public function setUp(): void
     {
         parent::setUp();
+
         $this->objectManager = \Magento\TestFramework\Helper\Bootstrap::getObjectManager();
         $this->cookieManager = $this->objectManager->create(\Magento\Framework\Stdlib\CookieManagerInterface::class);
         $this->storeManager = $this->objectManager->create(\Magento\Store\Model\StoreManagerInterface::class);
+
+        $this->remoteAddress = $this->getMockBuilder(\Magento\Framework\HTTP\PhpEnvironment\RemoteAddress::class)
+            ->disableOriginalConstructor()
+            ->getMock();
     }
 
     public function testItReturnsNotEmptyResponseBodyAnd200ResponseCodeForStoreViewWithDisabledAccessRestriction(): void
@@ -43,9 +35,6 @@ class StoreRestrictionValidatorTest extends \Magento\TestFramework\TestCase\Abst
      */
     public function testItReturnsNotEmptyResponseBodyAnd200ResponseCodeForStoreViewWithEnabledAccessRestrictionForWhitelistedIpAddress(): void
     {
-        $this->remoteAddress = $this->getMockBuilder(
-            \Magento\Framework\HTTP\PhpEnvironment\RemoteAddress::class
-        )->disableOriginalConstructor()->getMock();
         $this->remoteAddress->method('getRemoteAddress')->willReturn('1.1.1.1');
         $this->objectManager->addSharedInstance($this->remoteAddress, \Magento\Framework\HTTP\PhpEnvironment\RemoteAddress::class);
 
@@ -58,9 +47,6 @@ class StoreRestrictionValidatorTest extends \Magento\TestFramework\TestCase\Abst
      */
     public function testItReturnsEmptyResponseBodyAnd302ResponseCodeForStoreViewWithEnabledAccessRestrictionForNotWhitelistedIpAddress(): void
     {
-        $this->remoteAddress = $this->getMockBuilder(
-            \Magento\Framework\HTTP\PhpEnvironment\RemoteAddress::class
-        )->disableOriginalConstructor()->getMock();
         $this->remoteAddress->method('getRemoteAddress')->willReturn('3.3.3.3');
         $this->objectManager->addSharedInstance($this->remoteAddress, \Magento\Framework\HTTP\PhpEnvironment\RemoteAddress::class);
 
@@ -121,9 +107,10 @@ class StoreRestrictionValidatorTest extends \Magento\TestFramework\TestCase\Abst
         $this->assertNotEmptyResponseBodyAnd200ResponseCode();
     }
 
-    public static function loadRestrictedStore()
+    public static function loadRestrictedStore(): void
     {
         $storeManager = \Magento\Framework\App\ObjectManager::getInstance()->get(\Magento\Store\Model\StoreManager::class);
+
         $defaultStore = $storeManager->getStore();
         $defaultStore->setData('is_access_restricted', 1);
         $defaultStore->setData('restriction_bypass_cookie_value', 'stored_secret_value');

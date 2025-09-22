@@ -1,18 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MageSuite\StoreAccessRestriction\Service;
 
 class CmsPagesProvider
 {
     protected \Magento\Cms\Model\ResourceModel\Page\CollectionFactory $pageCollectionFactory;
 
-    public function __construct(
-        \Magento\Cms\Model\ResourceModel\Page\CollectionFactory $pageCollectionFactory
-    ) {
+    public function __construct(\Magento\Cms\Model\ResourceModel\Page\CollectionFactory $pageCollectionFactory)
+    {
         $this->pageCollectionFactory = $pageCollectionFactory;
     }
 
-    public function getCmsPage(?int $id): ?\Magento\Cms\Model\Page
+    public function getCmsPage(int $id): ?\Magento\Cms\Model\Page
     {
         if (!$id) {
             return null;
@@ -20,8 +21,9 @@ class CmsPagesProvider
 
         $collection = $this->pageCollectionFactory->create();
         $collection->addFieldToFilter('page_id', ['eq' => $id]);
+        $cmsPage = $collection->getFirstItem();
 
-        if ($cmsPage = $collection->getFirstItem()) {
+        if ($cmsPage) {
             return $cmsPage;
         }
 
