@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MageSuite\StoreAccessRestriction\Service;
 
 class StoreRestrictionValidator
@@ -8,18 +10,13 @@ class StoreRestrictionValidator
     public const CMS_PAGE_ACTION = 'cms_index_index';
 
     protected \Magento\Framework\HTTP\PhpEnvironment\RemoteAddress $remoteAddress;
-
     protected \Magento\Framework\Stdlib\CookieManagerInterface $cookieManager;
-
     protected \Magento\Store\Model\StoreManager $storeManager;
-
     protected \Magento\Framework\App\Request\Http $request;
-
     protected \Psr\Log\LoggerInterface $logger;
-
     protected \MageSuite\StoreAccessRestriction\Service\CmsPagesProvider $cmsPagesProvider;
 
-    protected $currentStore = null;
+    protected ?\Magento\Store\Api\Data\StoreInterface $currentStore = null;
 
     public function __construct(
         \Magento\Framework\HTTP\PhpEnvironment\RemoteAddress $remoteAddress,
@@ -40,13 +37,13 @@ class StoreRestrictionValidator
     public function isStoreAccessRestrictionEnabled(): bool
     {
         $currentStore = $this->getCurrentStore();
+
         return (bool)$currentStore->getIsAccessRestricted();
     }
 
     public function canAccessStore(): bool
     {
-        return $this->isRequestFromAllowedIp() || $this->isRequestWithBypassParam()
-            || $this->isRequestWithRestrictionBypassCookie() || $this->isTargetPage();
+        return $this->isRequestFromAllowedIp() || $this->isRequestWithBypassParam() || $this->isRequestWithRestrictionBypassCookie() || $this->isTargetPage();
     }
 
     protected function isRequestFromAllowedIp(): bool
@@ -86,7 +83,7 @@ class StoreRestrictionValidator
             return false;
         }
 
-        $cmsPage = $this->cmsPagesProvider->getCmsPage($cmsPageId);
+        $cmsPage = $this->cmsPagesProvider->getCmsPage((int)$cmsPageId);
 
         if (!$cmsPage) {
             return false;
@@ -102,7 +99,7 @@ class StoreRestrictionValidator
         return true;
     }
 
-    public function isRedirectToAnotherStore()
+    public function isRedirectToAnotherStore(): bool
     {
         $currentStore = $this->getCurrentStore();
         $storeParam = $this->request->getParam('___store');

@@ -1,18 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MageSuite\StoreAccessRestriction\Observer;
 
 class SaveCookieFromParam implements \Magento\Framework\Event\ObserverInterface
 {
-    /**
-     * @var \Magento\Framework\Stdlib\CookieManagerInterface
-     */
-    protected $cookieManager;
-
-    /**
-     * @var \Magento\Framework\Stdlib\Cookie\CookieMetadataFactory
-     */
-    protected $cookieMetadataFactory;
+    protected \Magento\Framework\Stdlib\CookieManagerInterface $cookieManager;
+    protected \Magento\Framework\Stdlib\Cookie\CookieMetadataFactory $cookieMetadataFactory;
 
     public function __construct(
         \Magento\Framework\Stdlib\CookieManagerInterface $cookieManager,
@@ -22,7 +17,7 @@ class SaveCookieFromParam implements \Magento\Framework\Event\ObserverInterface
         $this->cookieMetadataFactory = $cookieMetadataFactory;
     }
 
-    public function execute(\Magento\Framework\Event\Observer $observer)
+    public function execute(\Magento\Framework\Event\Observer $observer): void
     {
         method_exists($observer->getControllerAction(), 'getRequest') ?
             $cookieParamValue = $observer->getControllerAction()->getRequest()->getParam('bypass_store_restriction') :
@@ -33,7 +28,7 @@ class SaveCookieFromParam implements \Magento\Framework\Event\ObserverInterface
         }
     }
 
-    protected function setBypassRestrictionCookie($value)
+    protected function setBypassRestrictionCookie(string $value): void
     {
         $publicCookieMetadata = $this->cookieMetadataFactory->createPublicCookieMetadata();
         $publicCookieMetadata->setDurationOneYear();

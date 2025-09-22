@@ -1,32 +1,32 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MageSuite\StoreAccessRestriction\Test\Integration\Observer;
 
 class PreventAccessToRestrictedStoreTest extends \Magento\TestFramework\TestCase\AbstractController
 {
-    protected $objectManager;
-
-    protected $storeManager;
-
-    protected $searchCriteriaBuilder;
-
-    protected $pageRepositoryInterface;
+    protected ?\Magento\Framework\ObjectManagerInterface $objectManager;
+    protected ?\Magento\Store\Model\StoreManagerInterface $storeManager;
+    protected ?\Magento\Framework\Api\SearchCriteriaBuilder $searchCriteriaBuilder;
+    protected ?\Magento\Cms\Api\PageRepositoryInterface $pageRepositoryInterface;
 
     public function setUp(): void
     {
         parent::setUp();
+
         $this->objectManager = \Magento\TestFramework\Helper\Bootstrap::getObjectManager();
         $this->storeManager = $this->objectManager->create(\Magento\Store\Model\StoreManagerInterface::class);
         $this->searchCriteriaBuilder = $this->objectManager->create(\Magento\Framework\Api\SearchCriteriaBuilder::class);
-        $this->pageRepositoryInterface = $this->objectManager->create( \Magento\Cms\Api\PageRepositoryInterface::class);
+        $this->pageRepositoryInterface = $this->objectManager->create(\Magento\Cms\Api\PageRepositoryInterface::class);
     }
 
     /**
      * @magentoDbIsolation enabled
      * @magentoAppIsolation enabled
-     * @magentoDataFixture loadCmsPageFixture
+     * @magentoDataFixture MageSuite_StoreAccessRestriction::Test/Integration/_files/cms_page.php
      */
-    public function testItRedirectsToTheChosenCmsPageOnRestrictedStore()
+    public function testItRedirectsToTheChosenCmsPageOnRestrictedStore(): void
     {
         $currentStore = $this->storeManager->getStore();
 
@@ -46,10 +46,10 @@ class PreventAccessToRestrictedStoreTest extends \Magento\TestFramework\TestCase
     /**
      * @magentoDbIsolation enabled
      * @magentoAppIsolation enabled
-     * @magentoDataFixture loadCmsPageFixture
-     * @magentoDataFixture loadStoresFixture
+     * @magentoDataFixture MageSuite_StoreAccessRestriction::Test/Integration/_files/cms_page.php
+     * @magentoDataFixture MageSuite_StoreAccessRestriction::Test/Integration/_files/stores.php
      */
-    public function testItRedirectsToTheChosenCmsPageOnAnotherStore()
+    public function testItRedirectsToTheChosenCmsPageOnAnotherStore(): void
     {
         $currentStore = $this->storeManager->getStore();
         $itStore = $this->storeManager->getStore('it');
@@ -70,21 +70,11 @@ class PreventAccessToRestrictedStoreTest extends \Magento\TestFramework\TestCase
         );
     }
 
-    public function getCmsPage()
+    public function getCmsPage(): \Magento\Cms\Api\Data\PageInterface
     {
-        $searchCriteria = $this->searchCriteriaBuilder->addFilter('identifier', 'target-cms-page','eq')->create();
+        $searchCriteria = $this->searchCriteriaBuilder->addFilter('identifier', 'target-cms-page', 'eq')->create();
         $pages = $this->pageRepositoryInterface->getList($searchCriteria)->getItems();
 
         return array_pop($pages);
-    }
-
-    public static function loadStoresFixture()
-    {
-        include __DIR__ . "/../_files/stores.php";
-    }
-
-    public static function loadCmsPageFixture()
-    {
-        include __DIR__ . "/../_files/cms_page.php";
     }
 }

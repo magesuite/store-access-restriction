@@ -1,15 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MageSuite\StoreAccessRestriction\Plugin\Magento\Store\Block\Switcher;
 
 class RemoveRestrictedStoresFromSwitcher
 {
-    protected $stores = [];
+    protected array $stores = [];
 
-    public function afterGetRawStores(
-        \Magento\Store\Block\Switcher $subject,
-        $rawStores
-    ) {
+    public function afterGetRawStores(\Magento\Store\Block\Switcher $subject, $rawStores)
+    {
         $subjectClass = get_class($subject);
 
         if (isset($this->stores[$subjectClass])) {

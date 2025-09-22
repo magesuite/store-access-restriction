@@ -1,11 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MageSuite\StoreAccessRestriction\Observer;
 
 class AddFieldsToStoreEditView implements \Magento\Framework\Event\ObserverInterface
 {
     protected \Magento\Framework\Registry $registry;
-
     protected \MageSuite\StoreAccessRestriction\Service\CmsPagesProvider $cmsPagesProvider;
 
     public function __construct(
@@ -16,7 +17,7 @@ class AddFieldsToStoreEditView implements \Magento\Framework\Event\ObserverInter
         $this->cmsPagesProvider = $cmsPagesProvider;
     }
 
-    public function execute(\Magento\Framework\Event\Observer $observer)
+    public function execute(\Magento\Framework\Event\Observer $observer): void
     {
         /** @var \Magento\Backend\Block\System\Store\Edit\AbstractForm $block */
         $block = $observer->getBlock();
