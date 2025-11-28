@@ -19,7 +19,8 @@ class SaveCookieFromParam implements \Magento\Framework\Event\ObserverInterface
 
     public function execute(\Magento\Framework\Event\Observer $observer): void
     {
-        method_exists($observer->getControllerAction(), 'getRequest') ?
+        method_exists($observer->getControllerAction(), 'getRequest')
+        && is_callable([$observer->getControllerAction(), 'getRequest']) ?
             $cookieParamValue = $observer->getControllerAction()->getRequest()->getParam('bypass_store_restriction') :
             $cookieParamValue = null;
 
