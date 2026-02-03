@@ -31,7 +31,7 @@ class StoreRestrictionValidatorTest extends \Magento\TestFramework\TestCase\Abst
     }
 
     /**
-     * @magentoDataFixture loadRestrictedStore
+     * @magentoDataFixture MageSuite_StoreAccessRestriction::Test/Integration/_files/restricted_store.php
      */
     public function testItReturnsNotEmptyResponseBodyAnd200ResponseCodeForStoreViewWithEnabledAccessRestrictionForWhitelistedIpAddress(): void
     {
@@ -43,7 +43,7 @@ class StoreRestrictionValidatorTest extends \Magento\TestFramework\TestCase\Abst
     }
 
     /**
-     * @magentoDataFixture loadRestrictedStore
+     * @magentoDataFixture MageSuite_StoreAccessRestriction::Test/Integration/_files/restricted_store.php
      */
     public function testItReturnsEmptyResponseBodyAnd302ResponseCodeForStoreViewWithEnabledAccessRestrictionForNotWhitelistedIpAddress(): void
     {
@@ -55,7 +55,7 @@ class StoreRestrictionValidatorTest extends \Magento\TestFramework\TestCase\Abst
     }
 
     /**
-     * @magentoDataFixture loadRestrictedStore
+     * @magentoDataFixture MageSuite_StoreAccessRestriction::Test/Integration/_files/restricted_store.php
      */
     public function testItReturnsEmptyResponseBodyAnd302ResponseCodeForStoreViewWithEnabledAccessRestrictionAndWrongUriParam(): void
     {
@@ -64,7 +64,7 @@ class StoreRestrictionValidatorTest extends \Magento\TestFramework\TestCase\Abst
     }
 
     /**
-     * @magentoDataFixture loadRestrictedStore
+     * @magentoDataFixture MageSuite_StoreAccessRestriction::Test/Integration/_files/restricted_store.php
      */
     public function testItReturnsNotEmptyResponseBodyAnd200ResponseCodeForStoreViewWithEnabledAccessRestrictionAndValidUriParam(): void
     {
@@ -73,7 +73,7 @@ class StoreRestrictionValidatorTest extends \Magento\TestFramework\TestCase\Abst
     }
 
     /**
-     * @magentoDataFixture loadRestrictedStore
+     * @magentoDataFixture MageSuite_StoreAccessRestriction::Test/Integration/_files/restricted_store.php
      */
     public function testItReturnsEmptyResponseBodyAnd302ResponseCodeForStoreViewWithEnabledAccessRestrictionAndMissingCookieParam(): void
     {
@@ -82,7 +82,7 @@ class StoreRestrictionValidatorTest extends \Magento\TestFramework\TestCase\Abst
     }
 
     /**
-     * @magentoDataFixture loadRestrictedStore
+     * @magentoDataFixture MageSuite_StoreAccessRestriction::Test/Integration/_files/restricted_store.php
      */
     public function testItReturnsEmptyResponseBodyAnd302ResponseCodeForStoreViewWithEnabledAccessRestrictionAndWrongCookieParam(): void
     {
@@ -95,7 +95,7 @@ class StoreRestrictionValidatorTest extends \Magento\TestFramework\TestCase\Abst
     }
 
     /**
-     * @magentoDataFixture loadRestrictedStore
+     * @magentoDataFixture MageSuite_StoreAccessRestriction::Test/Integration/_files/restricted_store.php
      */
     public function testItReturnsNotEmptyResponseBodyAnd200ResponseCodeForStoreViewWithEnabledAccessRestrictionAndValidCookieParam(): void
     {
@@ -105,17 +105,6 @@ class StoreRestrictionValidatorTest extends \Magento\TestFramework\TestCase\Abst
         );
         $this->dispatch('/');
         $this->assertNotEmptyResponseBodyAnd200ResponseCode();
-    }
-
-    public static function loadRestrictedStore(): void
-    {
-        $storeManager = \Magento\Framework\App\ObjectManager::getInstance()->get(\Magento\Store\Model\StoreManager::class);
-
-        $defaultStore = $storeManager->getStore();
-        $defaultStore->setData('is_access_restricted', 1);
-        $defaultStore->setData('restriction_bypass_cookie_value', 'stored_secret_value');
-        $defaultStore->setData('allowed_ips', '1.1.1.1,2.2.2.2');
-        $defaultStore->save();
     }
 
     protected function assertNotEmptyResponseBodyAnd200ResponseCode(): void
